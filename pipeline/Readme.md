@@ -53,7 +53,7 @@ Run Kibana and connect it to Elasticsearch.
 
 ```sh
 docker run -d --name kib01 --net elk -p 5601:5601 \
-  -e ELASTICSEARCH_HOSTS="http://es01:9200" \
+  -e ELASTICSEARCH_HOSTS="http://host.docker.internal:9200" \
   -e XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY="this_is_a_long_random_string_change_it" \
   docker.elastic.co/kibana/kibana:8.17.3
 ```
@@ -76,21 +76,26 @@ input {
     path => "/logs/app.log"
     start_position => "beginning"
     sincedb_path => "/dev/null"
+    mode => "tail"
+    codec => multiline {
+      pattern => "^%{TIMESTAMP_ISO8601}"
+      negate => true
+      what => "previous"
+    }
   }
 }
 
 filter {
   grok {
-    match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} - %{LOGLEVEL:level} - %{GREEDYDATA:message}" }
+    match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} - %{LOGLEVEL:level} - %{GREEDYDATA:logmessage}" }
   }
 }
 
 output {
   elasticsearch {
-    hosts => ["http://es01:9200"]
-    index => "logs"
+    hosts => ["http://host.docker.internal:9200"]
+    index => "logs-%{+YYYY.MM.dd}"
   }
-  stdout { codec => rubydebug }
 }
 ```
 
