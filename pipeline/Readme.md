@@ -101,13 +101,18 @@ output {
 
 ## **🔹 6️⃣ Start Logstash**
 
+Create a volume to store logs
+```sh
+docker volume create logs_data
+```
+
 Now, start Logstash using the configuration.
 
 ```sh
-docker run -d --name logstash --net elk \
+docker run --rm -it --net elk \
   -e "XPACK_MONITORING_ENABLED=false" \
   -v "$(pwd)/logstash.conf:/usr/share/logstash/pipeline/logstash.conf" \
-  -v "$(pwd)/logs:/logs" \
+  -v logs_data:/logs \
   docker.elastic.co/logstash/logstash:8.17.3
 ```
 
@@ -146,8 +151,8 @@ if __name__ == "__main__":
 Run the script:
 
 ```sh
-mkdir -p logs  # Ensure the logs directory exists
-python3 script.py
+docker build -t my-script .
+docker run --rm -it -v logs_data:/logs my-script
 ```
 
 ✅ **Check if logs are flowing into Elasticsearch**:
@@ -196,5 +201,4 @@ You now have a full **logging pipeline**:
 3. **Elasticsearch** stores the logs.
 4. **Kibana** visualizes the logs.
 
-🔹 **Run these commands in the correct order**, and let me know if anything needs debugging! 🚀
 
