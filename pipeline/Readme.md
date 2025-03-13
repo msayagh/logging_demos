@@ -51,7 +51,7 @@ Run Kibana and connect it to Elasticsearch.
 
 ```sh
 docker run -d --name kib01 --net elk -p 5601:5601 \
-  -e ELASTICSEARCH_HOSTS="http://host.docker.internal:9200" \
+  -e ELASTICSEARCH_HOSTS="http://es01:9200" \
   -e XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY="this_is_a_long_random_string_change_it" \
   docker.elastic.co/kibana/kibana:8.17.3
 ```
@@ -91,7 +91,7 @@ filter {
 
 output {
   elasticsearch {
-    hosts => ["http://host.docker.internal:9200"]
+    hosts => ["http://es01:9200"]
     index => "logs-%{+YYYY.MM.dd}"
   }
 }
