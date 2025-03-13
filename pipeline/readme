@@ -1,3 +1,5 @@
+# ELK Stack Installation & Configuration Guide
+
 Here’s the **correct order** of commands to **install and configure** your ELK stack from scratch, ensuring a smooth setup. 🚀
 
 ---
@@ -51,7 +53,6 @@ docker run -d --name kib01 --net elk -p 5601:5601 \
   -e XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY="this_is_a_long_random_string_change_it" \
   docker.elastic.co/kibana/kibana:8.17.3
 ```
-
 
 ✅ **Check if Kibana is running**:
 - Open **[http://localhost:5601](http://localhost:5601)** in your browser.
@@ -125,7 +126,7 @@ if __name__ == "__main__":
     for i in range(10):
         logging.info(f"Hello World Log {i}")
         time.sleep(1)
-
+    
     logging.error("This is an error message")
 ```
 
@@ -179,3 +180,4 @@ You now have a full **logging pipeline**:
 4. **Kibana** visualizes the logs.
 
 🔹 **Run these commands in the correct order**, and let me know if anything needs debugging! 🚀
+
