@@ -105,6 +105,7 @@ Now, start Logstash using the configuration.
 
 ```sh
 docker run -d --name logstash --net elk \
+  -e "XPACK_MONITORING_ENABLED=false" \
   -v "$(pwd)/logstash.conf:/usr/share/logstash/pipeline/logstash.conf" \
   -v "$(pwd)/logs:/logs" \
   docker.elastic.co/logstash/logstash:8.17.3
