@@ -1,10 +1,9 @@
 # ELK Stack Installation & Configuration Guide
 
-Here’s the **correct order** of commands to **install and configure** your ELK stack from scratch, ensuring a smooth setup. 🚀
-
 ---
 
 ## **🔹 1️⃣ Clean Up Any Existing Containers & Network**
+
 Before starting fresh, remove any existing ELK containers and the network.
 
 ```sh
@@ -16,6 +15,7 @@ docker network rm elk
 ---
 
 ## **🔹 2️⃣ Create a Docker Network**
+
 We’ll use a dedicated network so that Elasticsearch, Logstash, and Kibana can communicate.
 
 ```sh
@@ -25,6 +25,7 @@ docker network create elk
 ---
 
 ## **🔹 3️⃣ Start Elasticsearch**
+
 Run Elasticsearch as a single-node cluster **without security** (for easier setup).
 
 ```sh
@@ -45,6 +46,7 @@ If Elasticsearch is working, you should see JSON output showing `"status": "gree
 ---
 
 ## **🔹 4️⃣ Start Kibana**
+
 Run Kibana and connect it to Elasticsearch.
 
 ```sh
@@ -55,45 +57,55 @@ docker run -d --name kib01 --net elk -p 5601:5601 \
 ```
 
 ✅ **Check if Kibana is running**:
-- Open **[http://localhost:5601](http://localhost:5601)** in your browser.
+
+- Open [**http://localhost:5601**](http://localhost:5601) in your browser.
 
 ---
 
 ## **🔹 5️⃣ Set Up Logstash Configuration**
+
 Create a **Logstash configuration file** (`logstash.yml`).
 
-#### **Save this as `logstash.conf` (not `.yml`)**
+#### **Save this as **``** (not **``**)**
+
 ```plaintext
 input {
   file {
     path => "/logs/app.log"
     start_position => "beginning"
     sincedb_path => "/dev/null"
+    mode => "tail"
+    codec => multiline {
+      pattern => "^%{TIMESTAMP_ISO8601}"
+      negate => true
+      what => "previous"
+    }
   }
 }
 
 filter {
   grok {
-    match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} - %{LOGLEVEL:level} - %{GREEDYDATA:message}" }
+    match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} - %{LOGLEVEL:level} - %{GREEDYDATA:logmessage}" }
   }
 }
 
 output {
   elasticsearch {
     hosts => ["http://es01:9200"]
-    index => "logs"
+    index => "logs-%{+YYYY.MM.dd}"
   }
-  stdout { codec => rubydebug }
 }
 ```
 
 ---
 
 ## **🔹 6️⃣ Start Logstash**
+
 Now, start Logstash using the configuration.
 
 ```sh
 docker run -d --name logstash --net elk \
+  -e "XPACK_MONITORING_ENABLED=false" \
   -v "$(pwd)/logstash.conf:/usr/share/logstash/pipeline/logstash.conf" \
   -v "$(pwd)/logs:/logs" \
   docker.elastic.co/logstash/logstash:8.17.3
@@ -108,7 +120,8 @@ docker logs -f logstash
 ---
 
 ## **🔹 7️⃣ Generate Logs Using Python**
-Create and save the following Python script as **`script.py`**:
+
+Create and save the following Python script as ``:
 
 ```python
 import logging
@@ -152,7 +165,8 @@ yellow open logs-2024.03.12 xyz123 1 1 100 0 123kb 123kb
 ---
 
 ## **🔹 8️⃣ Create Index Pattern in Kibana**
-1. Open **[http://localhost:5601](http://localhost:5601)**.
+
+1. Open [**http://localhost:5601**](http://localhost:5601).
 2. Click **"Stack Management"** (⚙️ in the left menu).
 3. Under **"Kibana"**, go to **"Data Views"** (formerly "Index Patterns").
 4. Click **"Create Data View"**.
@@ -160,20 +174,23 @@ yellow open logs-2024.03.12 xyz123 1 1 100 0 123kb 123kb
    ```
    logs*
    ```
-6. Select **`@timestamp`** as the time field.
+6. Select `` as the time field.
 7. Click **"Create Data View"**.
 
 ---
 
 ## **🔹 9️⃣ View Logs in Kibana**
+
 1. Go to **"Discover"** in Kibana.
-2. Select **"logs*"** from the dropdown.
+2. Select *"logs**"*\* from the dropdown.
 3. 🎉 You should now see your logs appearing!
 
 ---
 
 ## **✅ Summary**
+
 You now have a full **logging pipeline**:
+
 1. **Python script** writes logs (`script.py`).
 2. **Logstash** collects logs and sends them to **Elasticsearch**.
 3. **Elasticsearch** stores the logs.
