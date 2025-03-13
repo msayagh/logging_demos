@@ -1,7 +1,5 @@
 # ELK Stack Installation & Configuration Guide
 
-Here’s the **correct order** of commands to **install and configure** your ELK stack from scratch, ensuring a smooth setup. 🚀
-
 ---
 
 ## **🔹 1️⃣ Clean Up Any Existing Containers & Network**
