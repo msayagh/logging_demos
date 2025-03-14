@@ -66,30 +66,17 @@ docker run -d --name kib01 --net elk -p 5601:5601 \
 
 Create a **Logstash configuration file** (`logstash.yml`).
 
-#### **Save this as **``** (not **``**)**
-
 ```plaintext
 input {
   file {
     path => "/logs/app.log"
     start_position => "beginning"
     sincedb_path => "/dev/null"
-    mode => "tail"
-    codec => multiline {
-      pattern => "^%{TIMESTAMP_ISO8601}"
-      negate => true
-      what => "previous"
-    }
-  }
-}
-
-filter {
-  grok {
-    match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} - %{LOGLEVEL:level} - %{GREEDYDATA:logmessage}" }
   }
 }
 
 output {
+  stdout { codec => rubydebug }
   elasticsearch {
     hosts => ["http://es01:9200"]
     index => "logs-%{+YYYY.MM.dd}"
