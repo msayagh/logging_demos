@@ -64,25 +64,7 @@ docker run -d --name kib01 --net elk -p 5601:5601 \
 
 ## **🔹 5️⃣ Set Up Logstash Configuration**
 
-Create a **Logstash configuration file** (`logstash.yml`).
-
-```plaintext
-input {
-  file {
-    path => "/logs/app.log"
-    start_position => "beginning"
-    sincedb_path => "/dev/null"
-  }
-}
-
-output {
-  stdout { codec => rubydebug }
-  elasticsearch {
-    hosts => ["http://es01:9200"]
-    index => "logs-%{+YYYY.MM.dd}"
-  }
-}
-```
+Create a **Logstash configuration file** (`logstash.yml`). Look at the file provided in this repository.
 
 ---
 
@@ -113,29 +95,7 @@ docker logs -f logstash
 
 ## **🔹 7️⃣ Generate Logs Using Python**
 
-Create and save the following Python script as ``:
-
-```python
-import logging
-import time
-
-# Configure logging
-logging.basicConfig(
-    filename="logs/app.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
-# Generate logs
-if __name__ == "__main__":
-    for i in range(10):
-        logging.info(f"Hello World Log {i}")
-        time.sleep(1)
-    
-    logging.error("This is an error message")
-```
-
-Run the script:
+Use and Run the provided Python script:
 
 ```sh
 docker build -t my-script .
