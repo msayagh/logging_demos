@@ -96,7 +96,7 @@ docker volume create logs_data
 Now, start Logstash using the configuration.
 
 ```sh
-docker run --rm -it --net elk \
+docker run -d --name logstash --rm -it --net elk \
   -e "XPACK_MONITORING_ENABLED=false" \
   -v "$(pwd)/logstash.conf:/usr/share/logstash/pipeline/logstash.conf" \
   -v logs_data:/logs \
